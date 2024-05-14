@@ -38,7 +38,10 @@ def get_proton_electron_flux(start_time:datetime = None, end_time:datetime = Non
         url = "https://sohoftp.nascom.nasa.gov/sdb/goes/ace/daily/{:04d}{:02d}{:02d}_ace_epam_5m.txt".format(date.year, date.month, date.day)
         filename = "ace_epam_{:04d}{:02d}{:02d}.txt".format(date.year, date.month, date.day)
 
-        urlretrieve(url, filename)
+        try:
+            urlretrieve(url, filename)
+        except Exception:
+            continue
 
         files.append(filename)
 
@@ -147,7 +150,10 @@ def get_interplanetary_magnetic_field(start_time:datetime = None, end_time:datet
         url = "https://sohoftp.nascom.nasa.gov/sdb/goes/ace/daily/{:04d}{:02d}{:02d}_ace_mag_1m.txt".format(date.year, date.month, date.day)
         filename = "ace_imf_{:04d}{:02d}{:02d}.txt".format(date.year, date.month, date.day)
 
-        urlretrieve(url, filename)
+        try:
+            urlretrieve(url, filename)
+        except Exception:
+            continue
 
         files.append(filename)
 
@@ -240,9 +246,12 @@ def get_high_energy_proton_flux(start_time:datetime = None, end_time:datetime = 
 
     for date in dates_in_range:
         url = "https://sohoftp.nascom.nasa.gov/sdb/goes/ace/daily/{:04d}{:02d}{:02d}_ace_sis_5m.txt".format(date.year, date.month, date.day)
-        filename = "ace_solar_wind_{:04d}{:02d}{:02d}.txt".format(date.year, date.month, date.day)
+        filename = "ace_sis_{:04d}{:02d}{:02d}.txt".format(date.year, date.month, date.day)
 
-        urlretrieve(url, filename)
+        try:
+            urlretrieve(url, filename)
+        except Exception:
+            continue
 
         files.append(filename)
 
@@ -288,7 +297,7 @@ def get_high_energy_proton_flux(start_time:datetime = None, end_time:datetime = 
 
     return time, protons_over_10_mev, protons_over_30_mev
 
-def get_solar_wind(start_time:datetime = None, end_time:datetime = None) -> tuple[list[datetime], list[float], list[float], list[float]]:
+def get_solar_wind_plasma(start_time:datetime = None, end_time:datetime = None) -> tuple[list[datetime], list[float], list[float], list[float]]:
     """
     Retrieves the solar wind for a given time range.
 
@@ -318,7 +327,10 @@ def get_solar_wind(start_time:datetime = None, end_time:datetime = None) -> tupl
         url = "https://sohoftp.nascom.nasa.gov/sdb/goes/ace/daily/{:04d}{:02d}{:02d}_ace_swepam_1m.txt".format(date.year, date.month, date.day)
         filename = "ace_solar_wind_{:04d}{:02d}{:02d}.txt".format(date.year, date.month, date.day)
 
-        urlretrieve(url, filename)
+        try:
+            urlretrieve(url, filename)
+        except Exception:
+            continue
 
         files.append(filename)
 
@@ -407,7 +419,12 @@ def _most_recent_24_hours() -> tuple[datetime, datetime]:
 
 ## A few tests to make sure it's not crashing
 if __name__ == "__main__":
-    time, density, speed, temperature = get_solar_wind()
+    time, density, speed, temperature = get_solar_wind_plasma()
     time, bx, by, bz, bt, lat, lon = get_interplanetary_magnetic_field()
     time, protons_over_10_mev, protons_over_30_mev = get_high_energy_proton_flux()
     time, elec_38_53, elec_175_314, pro_47_68, pro_115_195, pro_310_580, pro_761_1220, pro_1060_1900, aniso_ratio = get_proton_electron_flux()
+
+    start_time = datetime(2024, 5, 10, 0, 0, tzinfo=timezone.utc)
+    end_time = datetime(2024, 5, 12, 0, 0, tzinfo=timezone.utc)
+
+    time, bx, by, bz, bt, lat, lon = get_interplanetary_magnetic_field(start_time, end_time)
